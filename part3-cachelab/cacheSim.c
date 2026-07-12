@@ -48,40 +48,60 @@ u_int32_t read_fifo(u_int32_t address)
 return 0;
 }
 
-int L1lookup(u_int32_t address)
+// in the cache -> valid =1 and correct tag
+int L1lookup(u_int32_t address) // 2 ways
 {
-///// IMPLEMENT THIS /////
+unsigned tag=getL1Tag(address);
+unsigned setID=getL1SetID(address);
+for(int way=0; way<2; way++ ){
+	if(L1_cache[setID][way].timeStamp!=0 && L1_cache[setID][tag].tag==tag){
+		return 1;
+	}
+}
 return 0;
 }
 
-int L2lookup(u_int32_t address)
+int L2lookup(u_int32_t address) //4 ways
 {
-///// IMPLEMENT THIS /////
+unsigned tag=getL1Tag(address);
+unsigned setID=getL1SetID(address);
+for(int way=0; way<4; way++ ){
+	if(L1_cache[setID][way].timeStamp!=0 && L1_cache[setID][tag].tag==tag){
+		return 1;
+	}
+}
 return 0;
 }
+
 
 unsigned int getL1SetID(u_int32_t address)
 {
-///// IMPLEMENT THIS /////
-return 0;
+	u_int32_t movedright;
+	unsigned compare;
+	movedright=address>>4; //move 4 most right bits to replace offset bits; make set digit to be the most right
+	// #set digit =log2(2sets)=1 digit
+	compare=movedright & 0x1; // 0x1=0001; comparing the most right digit to see whether it's set 0 or 1; 1&1=1 1&0 =0
+	return compare;
 }
 
 unsigned int getL2SetID(u_int32_t address)
 {
-///// IMPLEMENT THIS /////
-return 0;
+u_int32_t movedright;
+	unsigned compare;
+	movedright=address>>4;
+	// #set digit =log2(4sets)=2 digits 
+	compare=movedright & 0x3; // 0x3 =0011
+	return compare;
 }
 
 unsigned int getL1Tag(u_int32_t address)
 {
-///// IMPLEMENT THIS /////
-return 0;
+return address>>5; // L1 tag bit starts at 5th digit in the address (offset 0-3, set 4, tag 5-31)
 }
 
 unsigned int getL2Tag(u_int32_t address)
 {
-///// IMPLEMENT THIS /////
-return 0;
+return address >>6; // L2 tag bit start at 6th digit (offset 0-3, set 4-5, tag 6-31)
 }
 
 
