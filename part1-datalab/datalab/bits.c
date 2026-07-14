@@ -175,8 +175,9 @@ NOTES:
  *  Rating: 2
  */
 int sign(int x) {
-    // !x = check if x==0 so !!x check (!x)==0
-    return ((x>>31) |(!!x));
+  int signbit= x>>31; // move sign bit to the most right
+  int checkZero=!!(x); // if x=0 !0=1 !(!0)=0 else =1
+  return signbit | checkZero;
 }
 /* 
  * anyEvenBit - return 1 if any even-numbered bit in word set to 1
@@ -198,7 +199,7 @@ int anyEvenBit(int x) {
  *   Rating: 1
  */
 int minusOne(void) {
-  return ~0; 
+  return ~0;
 }
 /* 
  * bitMask - Generate a mask consisting of all 1's 
@@ -211,7 +212,11 @@ int minusOne(void) {
  *   Rating: 3
  */
 int bitMask(int highbit, int lowbit) {
-  return 2;
+  int low=~0<<lowbit; // make bits be 1 from lowit pos to the left;
+  int high=~((~0 << highbit) << 1); // make bits be 1 from highbit pos to the right; 
+  int intersect=high&low;
+  int is_less = (highbit + (~lowbit + 1)) >> 31; //if lowbit>highbit ==-1
+  return ~is_less&intersect; 
 }
 /* 
  * getByte - Extract byte n from word x
@@ -222,7 +227,8 @@ int bitMask(int highbit, int lowbit) {
  *   Rating: 2
  */
 int getByte(int x, int n) { 
-  return x >> (n << 3); // 1byte = 8bits =takes 2 digits -> x>>(n*8) -> n*8 ==n*2^3 ==n<<3
+  int bitShift = n << 3;// 1byte = 8bits =takes 2 digits -> x>>(n*8) -> n*8 ==n*2^3 ==n<<3
+  return (x >> bitShift) & 0xFF;
 }
 /* 
  * absVal - absolute value of x
@@ -233,7 +239,9 @@ int getByte(int x, int n) {
  *   Rating: 4
  */
 int absVal(int x) {
-  return 2;
+  int filter = x >> 31; // neg=-1 (all 1) pos&zero = all 0
+  int check = x ^ filter; 
+  return check + (filter & 1);
 }
 /*
  * bitCount - returns count of number of 1's in word
@@ -243,6 +251,7 @@ int absVal(int x) {
  *   Rating: 4
  */
 int bitCount(int x) {
+  // have no idea
   return 2;
 }
 /* 
@@ -255,7 +264,16 @@ int bitCount(int x) {
  *  Rating: 2
  */
 int byteSwap(int x, int n, int m) {
-    return 2;
+  int shift_n = n << 3; // 1byte=8bits shift with 3 bc 2**3=8
+  int shift_m = m << 3;
+  int bn=(x >> shift_n)& 0xFF;
+  int bm=(x>>shift_m)&0xFF;
+  int empty_mnPos = ~((0xFF << shift_n) | (0xFF << shift_m));
+  int x_empty = x & empty_mnPos; // make mn pos=0
+  // fill n with m and m with n
+  int fill_n = bn << shift_m; 
+  int fill_m = bm << shift_n;
+  return x_empty | fill_n | fill_m; 
 }
 /* 
  * bang - Compute !x without using !
@@ -265,7 +283,9 @@ int byteSwap(int x, int n, int m) {
  *   Rating: 4 
  */
 int bang(int x) {
-  return 2;
+  int signCheck = x | (~x + 1);
+  int shiftSign= signCheck >> 31;
+  return ~shiftSign & 1;
 }
 /* 
  * tmin - return minimum two's complement integer 
@@ -274,7 +294,7 @@ int bang(int x) {
  *   Rating: 1
  */
 int tmin(void) {
-  return 1<<32;
+  return 1<<31;
 }
 /* 
  * isLessOrEqual - if x <= y  then return 1, else return 0 
@@ -284,7 +304,13 @@ int tmin(void) {
  *   Rating: 3
  */
 int isLessOrEqual(int x, int y) {
-  return 2;
+  int signx = (x >> 31) & 1;
+  int signy = (y >> 31) & 1;
+
+  int diffCheck = signx ^ signy; //if their signs are different =1
+  int diff = y + (~x + 1); // y - x
+  int diffSign = (diff >> 31) & 1;  // sign for (y-x)
+  return (diffCheck& signx) | ((!diffCheck)& (!diffSign));
 }
 /* 
  * divpwr2 - Compute x/(2^n), for 0 <= n <= 30
@@ -295,8 +321,10 @@ int isLessOrEqual(int x, int y) {
  *   Rating: 2
  */
 int divpwr2(int x, int n) {
-    return x>>n;
-}
+  int signbit = x >> 31;
+  int bias = (1 << n) + ~0;
+  return (x + (signbit & bias)) >> n;
+  }
 /* 
  * negate - return -x 
  *   Example: negate(1) = -1.
@@ -316,6 +344,7 @@ int negate(int x) {
  *   Rating: 4 
  */
 int greatestBitPos(int x) {
+  //have no idea
   return 2;
 }
 /* 
@@ -326,5 +355,7 @@ int greatestBitPos(int x) {
  *   Rating: 3
  */
 int isPositive(int x) {
-  return 2;
+  int posOrNeg= x>>31; // pos=0 neg=1
+  int zeroCheck= !(!x); // if x=0 !x=1 ->!(1)=0; if x>0 !(!1)=!(0)=1
+  return !posOrNeg &zeroCheck; //if posOrNeg=0 -> !(0)=1, zeroCheck=!(!1)=1 ->1&1=1
 }
