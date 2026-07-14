@@ -198,7 +198,7 @@ int anyEvenBit(int x) {
  *   Rating: 1
  */
 int minusOne(void) {
-  return 2;
+  return ~0; 
 }
 /* 
  * bitMask - Generate a mask consisting of all 1's 
@@ -221,8 +221,8 @@ int bitMask(int highbit, int lowbit) {
  *   Max ops: 6
  *   Rating: 2
  */
-int getByte(int x, int n) {
-  return 2;
+int getByte(int x, int n) { 
+  return x >> (n << 3); // 1byte = 8bits =takes 2 digits -> x>>(n*8) -> n*8 ==n*2^3 ==n<<3
 }
 /* 
  * absVal - absolute value of x
@@ -274,7 +274,7 @@ int bang(int x) {
  *   Rating: 1
  */
 int tmin(void) {
-  return 2;
+  return 1<<32;
 }
 /* 
  * isLessOrEqual - if x <= y  then return 1, else return 0 
@@ -295,7 +295,7 @@ int isLessOrEqual(int x, int y) {
  *   Rating: 2
  */
 int divpwr2(int x, int n) {
-    return 2;
+    return x>>n;
 }
 /* 
  * negate - return -x 
@@ -305,7 +305,7 @@ int divpwr2(int x, int n) {
  *   Rating: 2
  */
 int negate(int x) {
-  return 2;
+  return ~x+1;
 }
 /* 
  * greatestBitPos - return a mask that marks the position of the
