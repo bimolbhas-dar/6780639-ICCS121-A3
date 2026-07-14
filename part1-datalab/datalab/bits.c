@@ -1,7 +1,7 @@
 /* 
  * CS:APP Data Lab 
  * 
- * <Bimolbhas Darasidh and userid here>
+ * <Bimolbhas Darasidh and student id 6780639 >
  * 
  * bits.c - Source file with your solutions to the Lab.
  *          This is the file you will hand in to your instructor.
@@ -212,7 +212,7 @@ int minusOne(void) {
  *   Rating: 3
  */
 int bitMask(int highbit, int lowbit) {
-  int low=~0<<lowbit; // make bits be 1 from lowit pos to the left;
+  int low=~0<<lowbit; // make bits be 1 from lowbit pos to the left;
   int high=~((~0 << highbit) << 1); // make bits be 1 from highbit pos to the right; 
   int intersect=high&low;
   int is_less = (highbit + (~lowbit + 1)) >> 31; //if lowbit>highbit ==-1
